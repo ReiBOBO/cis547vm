@@ -25,39 +25,42 @@ and F-Measure scores for each analyzer on this suite of programs.
 ===========================================================================
 | Program   | Ground Truth  |     AFL      | IKOS Interval |   IKOS DBM   |
 |=========================================================================|
-| test0.c   |               |              |               |              |
-| test1.c   |               |              |               |              |
-| test2.c   |               |              |               |              |
-| test3.c   |               |              |               |              |
-| test4.c   |               |              |               |              |
-| test5.c   |               |              |               |              |
-| test6.c   |               |              |               |              |
-| test7.c   |               |              |               |              |
-| test8.c   |               |              |               |              |
-| test9.c   |               |              |               |              |
+| test0.c   |     right     |    Accept    |     Accept    |    Accept    |
+| test1.c   |     wrong     |    Reject    |     Reject    |    Reject    |
+| test2.c   |     wrong     |    Reject    |     Reject    |    Reject    |
+| test3.c   |     right     |    Accept    |     Reject    |    Reject    |
+| test4.c   |     right     |    Accept    |     Reject    |    Accept    |
+| test5.c   |     wrong     |    Accept    |     Reject    |    Reject    |
+| test6.c   |     wrong     |    Reject    |     Reject    |    Reject    |
+| test7.c   |     wrong     |    Reject    |     Reject    |    Reject    |
+| test8.c   |     right     |    Accept    |     Reject    |    Reject    |
+| test9.c   |     wrong     |    Reject    |     Reject    |    Reject    |
 |=========================================================================|
-| Precision |     ---       |     ---      |     ---       |     ---      |
-| Recall    |     ---       |     ---      |     ---       |     ---      |
-| F-measure |     ---       |     ---      |     ---       |     ---      |
+| Precision |     1         |     1        |     2/3       |     3/4      |
+| Recall    |     1         |     5/6      |     1         |     1        |
+| F-measure |     1         |     10/11    |     4/5       |     6/7      |
 ===========================================================================
 
 Part B: Answer the below questions. Provide short
 explanations to justify your answers.
 
 Question 1: From the given programs, can AFL be a sound analysis? Can it be complete?
-Answer:
+Answer: Since AFL'S recall is not one which means there is some false negative accepted by AFL. AFL is not sound.
+However, since the Precision is 1. AFL is complete.
 
 
 
 
 Question 2: From the given programs, can IKOS interval be a sound analysis? Can it be complete?
-Answer:
+Answer:Since IKOS interval has a recall 1. Meaning it rejects all bad programs. Then it is sound.
+However, IkOS interval has a Precision less than 1. Meaning there are false positives. Hence it is not complete.
 
 
 
 
 Question 3: From the given programs, can IKOS DBM be a sound analysis? Can it be complete?
-Answer:
+Answer: Since IKOS DBM has a recall 1. Meaning it rejects all bad programs. Then it is sound.
+However, IkOS DBM has a Precision less than 1. Meaning there are false positives. Hence it is not complete.
 
 
 
@@ -66,7 +69,9 @@ Question 4: What are the pros and cons of using the Interval versus DBM
 domains in IKOS to find divide-by-zero errors?  Comment
 on both the accuracy and cost of the analyzer under these two domains.
 
-Answer:
+Answer: Based on the observation of 10 programs we run.
+Efficiency-wise, IKOS DBM takes more time than IKOS Interval. However, DBM is more accurate.
+Since F measure of DMB is higher than F mesure of Interval. 
 
 
 

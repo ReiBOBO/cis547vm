@@ -19,6 +19,7 @@ bool Instrument::runOnFunction(Function &F) {
   outs() << "Running " << PASS_DESC << " on function " << FunctionName << "\n";
 
   outs() << "Instrument Instructions\n";
+  
   LLVMContext &Context = F.getContext();
   Module *M = F.getParent();
 
@@ -48,6 +49,11 @@ bool Instrument::runOnFunction(Function &F) {
      * TODO: Add code to check if the instruction is a BinaryOperator and if so,
      * instrument the instruction as specified in the Lab document.
      */
+    // try casting the instruction to Binary Operator, if null then continue
+    auto *binary = dyn_cast<BinaryOperator>(&Inst);
+    if(binary!=NULL){
+      instrumentBinOpOperands(M,binary,Line,Col);
+    }
   }
 
   return true;
@@ -77,6 +83,26 @@ void instrumentBinOpOperands(Module *M, BinaryOperator *BinOp, int Line,
    * its location, operation type and the runtime values of its
    * operands.
    */
+  /*BINOP_OPERANDS_FUNCTION_NAME is alias of __binop_op__ which takes 5 arguments
+  * we can retrieve the operands(op1,op2) and operator from the given BinaryOperator 
+  */
+  char operator_symbol = getBinOpSymbol(BinOp->getOpcode());
+  auto Opertor_value = ConstantInt::get(CharType, operator_symbol);
+  //"%0"
+  auto op1 = BinOp->getOperand(0);
+  auto op2 = BinOp->getOperand(1);
+  // auto op1Val = stoi (op1.substr(1, op1.length()));
+  // auto op2Val = stoi (op2.substr(1, op2.length()));;
+  // auto op1Value = ConstantInt::get(Int32Type,op1Val);
+  // auto op2Value = ConstantInt::get(Int32Type,op2Val);
+  auto LineVal = ConstantInt::get(Int32Type, Line);
+  auto ColVal = ConstantInt::get(Int32Type, Col);
+  //adding all arguments to a set
+  std::vector<Value *> Args = {Opertor_value,LineVal, ColVal,op1,op2};
+  //Inject function before I(the given instruction)
+  auto *BinopFunction = M->getFunction(BINOP_OPERANDS_FUNCTION_NAME);
+  //Insert instructions before given instruction.
+  CallInst::Create(BinopFunction, Args,"",BinOp);
 }
 
 char Instrument::ID = 1;
