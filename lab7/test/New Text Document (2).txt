@@ -1,0 +1,117 @@
+Dataflow Analysis Results:
+Instruction:   %call = call i32 @getchar()
+In set: 
+
+Out set: 
+    [ %call    |-> MaybeZero ]
+
+Instruction:   br label %while.cond
+In set: 
+    [ %call    |-> MaybeZero ]
+Out set: 
+    [ %call    |-> MaybeZero ]
+
+Instruction:   %sum.0 = phi i32 [ 0, %entry ], [ %add, %while.body ]
+In set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+Out set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+
+Instruction:   %cmp = icmp slt i32 %sum.0, 50
+In set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+Out set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+
+Instruction:   br i1 %cmp, label %while.body, label %while.end
+In set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+Out set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+
+Instruction:   %add = add nsw i32 %sum.0, %call
+In set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+Out set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+
+Instruction:   br label %while.cond
+In set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+Out set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+
+Instruction:   %sub = sub nsw i32 %sum.0, 55
+In set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+Out set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sub     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+
+Instruction:   %div = sdiv i32 %call, %sub
+In set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %sub     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+Out set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %div     |-> Uninit    ]
+    [ %sub     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+
+Instruction:   ret void
+In set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %div     |-> MaybeZero ]
+    [ %sub     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+Out set: 
+    [ %add     |-> MaybeZero ]
+    [ %call    |-> MaybeZero ]
+    [ %cmp     |-> MaybeZero ]
+    [ %div     |-> MaybeZero ]
+    [ %sub     |-> MaybeZero ]
+    [ %sum.0   |-> MaybeZero ]
+

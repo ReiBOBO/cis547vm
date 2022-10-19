@@ -17,7 +17,7 @@
 #include "Domain.h"
 
 namespace dataflow {
-
+//Memory is a hashMap where the key is string, and value is domain {Uninit,Zero,NonZero,MaybeZero}
 using Memory = std::map<std::string, Domain *>;
 
 struct DivZeroAnalysis : public FunctionPass {

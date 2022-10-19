@@ -6,7 +6,6 @@
 extern const char *WHITESPACES;
 
 namespace dataflow {
-
 /**
  * @brief Get a human-readable string name for an llvm Value
  *
@@ -18,7 +17,7 @@ std::string variable(const Value *Val);
 /**
  * @brief Try to extract the Domain of a value.
  *
- * When Val is a ConstantInt, we can extract its Domain.
+ * When Val is a ConstantInt, we can extract its Domain.?
  *
  * @param Val Value to extract the Domain for.
  * @return Domain::Element Domain of Val, or Domain::Uninit if

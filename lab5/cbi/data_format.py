@@ -4,7 +4,7 @@ from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Tuple, Type, Union
 
-
+#automatically create init__ use all properties in order
 @dataclass
 class CBILogEntry:
     """
@@ -39,20 +39,20 @@ class CBILogEntry:
 """Type Alias for a list of CBILogEntry"""
 CBILog: Type[List[CBILogEntry]] = List[CBILogEntry]
 
-
+#Enum in C, defined as a type can be one of the four values
 class ObservationStatus(Enum):
     """
     Enum for the Observation Status of a predicate.
 
     :param NEVER: The predicate was never observed.
-    :param TRUE: The predicate was observed and was always true.
-    :param FALSE: The predicate was observed and was always false.
+    :param ONLY_TRUE: The predicate was observed and was always true.
+    :param ONLY_FALSE: The predicate was observed and was always false.
     :param BOTH: The predicate was observed at least once as true and false.
     """
 
     NEVER = "never"
-    TRUE = "true"
-    FALSE = "false"
+    ONLY_TRUE = "true"
+    ONLY_FALSE = "false"
     BOTH = "both"
 
     @classmethod
@@ -60,7 +60,7 @@ class ObservationStatus(Enum):
         """
         Convinence method to create an Observation status enum from a boolean.
         """
-        return cls.TRUE if observed_as else cls.FALSE
+        return cls.ONLY_TRUE if observed_as else cls.ONLY_FALSE
 
     @staticmethod
     def merge(observation1, observation2) -> "ObservationStatus":
@@ -106,6 +106,7 @@ class PredicateType:
     ALL_TYPES = BRANCH_TYPES + RETURN_TYPES
 
     @classmethod
+    #def alternative (self, value)
     def alternatives(cls, value: Union[bool, int]) -> List[Tuple[str, bool]]:
         """
         Gel all possible Branch/Return types for a given value
@@ -152,6 +153,7 @@ class PredicateType:
 
 
 @dataclass(init=False, order=True, unsafe_hash=True)
+#dataclass __eq__ magic functions comparing parameters
 class Predicate:
     """
     Data class for a predicate.
@@ -170,6 +172,7 @@ class Predicate:
         self,
         line: int,
         column: int,
+        #why str
         value: Union[bool, int, str],
     ):
         """
@@ -216,9 +219,13 @@ class PredicateInfo:
         :return: The failure value.
         """
         # TODO: Implement the calculation of the failure value.
-
-
-        return 0
+        #simple formula but do something prevent 0 division
+        denominator = self.num_true_in_failure+self.num_true_in_success
+        nominator =  self.num_true_in_failure
+        if(denominator==0):
+            return 0
+        return nominator/denominator
+        
 
     @property
     def context(self) -> float:
@@ -228,8 +235,13 @@ class PredicateInfo:
         :return: The context value.
         """
         # TODO: Implement the calculation of the context value.
+        #simple formula but do something prevent 0 division
 
-        return 0
+        denominator=self.num_observed_in_failure+self.num_observed_in_success
+        nominator=self.num_observed_in_failure
+        if(denominator==0):
+            return 0
+        return nominator/denominator
 
     @property
     def increase(self):
@@ -240,7 +252,7 @@ class PredicateInfo:
         """
         # TODO: Implement the calculation of the increase value.
 
-        return 0
+        return self.failure-self.context
 
     """
     Helper methods that map variable names to names in lecture slides.

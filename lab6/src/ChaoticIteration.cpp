@@ -73,7 +73,24 @@ Memory *join(Memory *Mem1, Memory *Mem2) {
    *   domain D2, then Domain::join D1 and D2 to find the new domain D,
    *   and add instruction I with domain D to the Result.
    */
-  return NULL;
+  //what if they are empty?
+  
+  auto res = new Memory(*Mem2);
+  for (auto Iter = Mem1->begin(); Iter != Mem1->end();  ++Iter) {
+
+    auto key = (*Iter).first;
+    auto mem1val = (*Iter).second;
+    auto domain = new Domain(mem1val->Value);
+    const auto It = res->find(key);
+  
+    if (It == res->end()) domain = Domain::join(domain, new Domain(Domain::Element::Uninit));
+    else domain = Domain::join(mem1val,It->second);
+
+    
+    res->insert({key,domain});
+  }
+   
+  return res;
 }
 
 void DivZeroAnalysis::flowIn(Instruction *Inst, Memory *InMem) {
@@ -84,6 +101,14 @@ void DivZeroAnalysis::flowIn(Instruction *Inst, Memory *InMem) {
    *   + Get the Out Memory of Pred using OutMap.
    *   + Join the Out Memory with InMem.
    */
+  auto preds = getPredecessors(Inst);
+  for(auto & pred: preds){
+    auto mem1 = OutMap[pred];
+    InMem=join(mem1, InMem);
+  }
+  //do I need to join this?
+  InMap[Inst] =InMem;
+  
 }
 
 /**
@@ -95,6 +120,7 @@ void DivZeroAnalysis::flowIn(Instruction *Inst, Memory *InMem) {
  * @return true if the two memories are equal, false otherwise.
  */
 bool equal(Memory *Mem1, Memory *Mem2) {
+
   /**
    * TODO: Write your code to implement check for equality of two memories.
    *
@@ -104,7 +130,31 @@ bool equal(Memory *Mem1, Memory *Mem2) {
    * If any instruction I is present in Mem1 with domain D1 and in Mem2
    *   with domain D2, if D1 and D2 are unequal, then the memories are unequal.
    */
-  return false;
+  //check if all keys in mem1 also in mem2
+  for(auto Iter=Mem1->begin(); Iter!=Mem1->end(); Iter++){
+    auto key = Iter->first;
+    auto domain1 = Iter->second;
+    //if the key is not in the other Mem and it is not uninit then return false
+    if((Mem2->count(key))<=0 && domain1->Value!=Domain::Element::Uninit) return false;
+    else{
+      auto domain2 = (*Mem2)[key];
+      if(!(Domain::equal(*domain1,*domain2))) return false;
+    }
+  }
+  //check if all keys in mem2 also in mem1
+  for(auto Iter=Mem2->begin(); Iter!=Mem2->end(); Iter++){
+    auto key = Iter->first;
+    auto domain1 = Iter->second;
+    //if the key is not in the other Mem and it is not uninit then return false
+    if((Mem1->count(key))<=0 && domain1->Value!=Domain::Element::Uninit ) return false;
+    else{
+        auto domain2 = (*Mem2)[key];
+        if(!(Domain::equal(*domain1,*domain2))) return false;
+    }
+  }
+  
+  //passed all tests return true.
+  return true;
 }
 
 void DivZeroAnalysis::flowOut(Instruction *Inst, Memory *Pre, Memory *Post,
@@ -114,8 +164,25 @@ void DivZeroAnalysis::flowOut(Instruction *Inst, Memory *Pre, Memory *Post,
    *
    * For each given instruction, merge abstract domain from pre-transfer memory
    * and post-transfer memory, and update the OutMap.
-   * If the OutMap changed then also update the WorkSet.
+   * If the OutMap changed then also update? the WorkSet.
    */
+  //pre is the outmap before modify last transfercall
+  //post is the updated inmap with transfer going to become the new outmap. whatever comes out of transfer function
+  //check if pre == post 
+
+  if(!equal(Pre,Post)){
+    OutMap[Inst]=new Memory(*Post);
+    //visit all successors of that instruction
+    //add my successors to the workset to makesure they are visited again.
+    //add to work set.
+    //how to update workset?
+    //WorkSet.insert(Inst); don't need because this is up to date.
+    auto successors = getSuccessors(Inst);
+    for( auto & successor:successors){
+    WorkSet.insert(successor);
+    }
+  }
+  
 }
 
 void DivZeroAnalysis::doAnalysis(Function &F) {
@@ -130,10 +197,32 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
    * - Pop an instruction from the WorkSet.
    * - Construct it's Incoming Memory using flowIn.
    * - Evaluate the instruction using transfer and create the OutMemory.
+   * call transfer create the map and pass reference to transfer, make a copy of inmap and pass in , bc you dont want to change.
    * - Use flowOut along with the previous Out memory and the current Out
    *   memory, to check if there is a difference between the two to update the
    *   OutMap and add all successors to WorkSet.
    */
+  //Initialize the WorkSet with all the instructions in the function.
+  for(inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+    WorkSet.insert(&(*I));
+  }
+  while(!WorkSet.empty()){
+    //pop inst 
+    //if I use the iterator, should never update the object
+    int count=0;
+    errs() << "count == " << count++ << "\n";
+    
+   
+    
+    Instruction* Inst = WorkSet.front();
+    flowIn(Inst,InMap[Inst]);    
+    auto newOutMem= new Memory(*InMap[Inst]); //stack allocated go out of scope then
+    transfer(Inst, InMap[Inst], *newOutMem); //will modify newOut
+    flowOut(Inst,InMap[Inst],newOutMem,WorkSet);
+    WorkSet.remove(Inst);
+    errs() << "print InMap/OutMap finished \n";
+  }
+
 }
 
 } // namespace dataflow
