@@ -82,8 +82,9 @@ Memory *join(Memory *Mem1, Memory *Mem2) {
     auto mem1val = (*Iter).second;
     auto domain = new Domain(mem1val->Value);
     const auto It = res->find(key);
-  
+    //the key is not in Mem2
     if (It == res->end()) domain = Domain::join(domain, new Domain(Domain::Element::Uninit));
+    //the key is also in Mem2
     else domain = Domain::join(mem1val,It->second);
 
     
@@ -102,12 +103,21 @@ void DivZeroAnalysis::flowIn(Instruction *Inst, Memory *InMem) {
    *   + Join the Out Memory with InMem.
    */
   auto preds = getPredecessors(Inst);
+  auto mem =  new Memory();
   for(auto & pred: preds){
     auto mem1 = OutMap[pred];
-    InMem=join(mem1, InMem);
+    mem=join(mem1, mem);
+  }
+  for(auto & s: *mem){
+    
+    (*InMem)[s.first]=s.second;
+    
   }
   //do I need to join this?
-  InMap[Inst] =InMem;
+  // InMap[Inst] =InMem;
+  // errs() <<"Insturction is :"<< *Inst <<"\n";
+  // printMemory(InMap[Inst]);
+  // getchar();
   
 }
 
@@ -171,7 +181,10 @@ void DivZeroAnalysis::flowOut(Instruction *Inst, Memory *Pre, Memory *Post,
   //check if pre == post 
 
   if(!equal(Pre,Post)){
-    OutMap[Inst]=new Memory(*Post);
+    Pre->clear();
+    for(auto & s: *Post){
+      Pre->insert(s);
+    }
     //visit all successors of that instruction
     //add my successors to the workset to makesure they are visited again.
     //add to work set.
@@ -209,18 +222,12 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
   while(!WorkSet.empty()){
     //pop inst 
     //if I use the iterator, should never update the object
-    int count=0;
-    errs() << "count == " << count++ << "\n";
-    
-   
-    
     Instruction* Inst = WorkSet.front();
     flowIn(Inst,InMap[Inst]);    
-    auto newOutMem= new Memory(*InMap[Inst]); //stack allocated go out of scope then
+    auto newOutMem= new Memory(*InMap[Inst]); //put on HEAP
     transfer(Inst, InMap[Inst], *newOutMem); //will modify newOut
-    flowOut(Inst,InMap[Inst],newOutMem,WorkSet);
+    flowOut(Inst,OutMap[Inst],newOutMem,WorkSet);//when I flow out , comparing outmap of that inst before what I have done to the instruction
     WorkSet.remove(Inst);
-    errs() << "print InMap/OutMap finished \n";
   }
 
 }

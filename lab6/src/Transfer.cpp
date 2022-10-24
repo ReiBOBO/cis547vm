@@ -133,6 +133,26 @@ Domain *eval(CmpInst *Cmp, const Memory *InMem) {
       
 
         switch(predicate){
+          case llvm::CmpInst::ICMP_NE:
+          //1 0!=0, false, 0
+          //2 0!=maybe0, maybe0
+          //3 0!=non0, true, non0
+          //4 maybe0!=0, maybe0
+          //5 maybe0 != maybe0,maybe0
+          //6 maybe0 !=non0,maybe0
+          //7 non0!=0 true, non0
+          //8 non0!=maybe0, maybe0
+          //9 non0!=non0, maybe0  
+            if(Domain::equal(*domain1,*zero)){
+              //case 1
+              if(Domain::equal(*domain2,*zero)) return zero;
+              //case 3
+              if(Domain::equal(*domain2,*non0)) return non0;
+            }
+            if(Domain::equal(*domain2,*zero)){
+              if((Domain::equal(*domain1,*non0))) return non0;
+            }
+            return maybe0;
           case llvm::CmpInst::ICMP_EQ:       
           //1 zero == maybezero will be maybezero
           //2 zero == non zero will be zero
