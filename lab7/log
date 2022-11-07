@@ -1,0 +1,4 @@
+Error opening '../build/DivZeroPass.so': ../build/DivZeroPass.so: cannot open shared object file: No such file or directory
+  -load request ignored.
+opt: Unknown command line argument '-DivZero'.  Try: 'opt -help'
+opt: Did you mean '-die'?

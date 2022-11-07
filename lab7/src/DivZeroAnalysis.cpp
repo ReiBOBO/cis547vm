@@ -31,6 +31,23 @@ bool DivZeroAnalysis::check(Instruction *Inst) {
    *
    * Hint: getOrExtract function may be useful to simplify your code.
    */
+    if(auto biInst = dyn_cast<BinaryOperator>(Inst)){
+    //ignore unint only care 0 maybe0
+    auto opCode = biInst->getOpcode();
+    // we only care about the division
+    if(opCode==Instruction::UDiv || opCode==Instruction::SDiv || opCode==Instruction::FDiv){
+      //get the divisor value
+      auto divisor = biInst->getOperand(1);
+      //get the memory dictionary of current instruction
+      auto mem = InMap[biInst];
+      //extract the domain of the divisor
+      auto domain = getOrExtract(mem,divisor);
+      //if it is zero or maybezero, then it is in danger
+      if(domain->Value==Domain::Element::Zero || domain->Value==Domain::Element::MaybeZero){
+        return true;
+      }
+    }
+  }
   return false;
 }
 

@@ -112,7 +112,7 @@ void DivZeroAnalysis::flowIn(Instruction *Inst, Memory *InMem) {
     
     (*InMem)[s.first]=s.second;
     
-  }
+  }\
   //do I need to join this?
   // InMap[Inst] =InMem;
   // errs() <<"Insturction is :"<< *Inst <<"\n";
@@ -219,13 +219,15 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
   for(inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
     WorkSet.insert(&(*I));
   }
+  
   while(!WorkSet.empty()){
     //pop inst 
     //if I use the iterator, should never update the object
     Instruction* Inst = WorkSet.front();
-    flowIn(Inst,InMap[Inst]);    
-    auto newOutMem= new Memory(*InMap[Inst]); //put on HEAP
-    transfer(Inst, InMap[Inst], *newOutMem); //will modify newOut
+    auto in =InMap[Inst];
+    flowIn(Inst,in);    
+    auto newOutMem= new Memory(*in); //put on HEAP
+    transfer(Inst, in, *newOutMem); //will modify newOut
     flowOut(Inst,OutMap[Inst],newOutMem,WorkSet);//when I flow out , comparing outmap of that inst before what I have done to the instruction
     WorkSet.remove(Inst);
   }

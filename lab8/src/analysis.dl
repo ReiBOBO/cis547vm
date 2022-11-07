@@ -7,24 +7,24 @@
 .output use
 
 
-.decl kill(curr_inst: symbol, old_inst: symbol)
-.decl next(curr_inst: symbol, next_inst: symbol)
-.decl in(inst: symbol, def_inst: symbol)
-.decl out(inst: symbol, def_inst: symbol)
+.decl kill(curr_inst: symbol, old_inst: symbol)//kill(curr_inst, old_inst): Instruction curr_inst kills definition at instruction old_inst.
+.decl next(curr_inst: symbol, next_inst: symbol) //next(curr_inst, next_inst): Instruction next_inst is an immediate successor of instruction curr_inst.
+.decl in(inst: symbol, def_inst: symbol) //in(inst, def_inst): Definition at defining instruction def_inst may reach the program point just before instruction inst.
+.decl out(inst: symbol, def_inst: symbol) //out(inst, def_inst): Definition at defining instruction def_inst may reach the program point just after instruction inst.
 
 .output kill
 .input next
-.output next
+.output next //?
 .output in
-.output out
+.output out //?
 
 
-.decl taint(inst: symbol)
-.decl edge(from: symbol, to: symbol)
-.decl path(from: symbol, to: symbol)
-.decl sanitizer(inst: symbol)
-.decl div(denom: symbol, inst: symbol)
-.decl alarm(inst: symbol)
+.decl taint(inst: symbol) //taint(inst) : There exists a function call at intruction inst that reads a tainted in
+.decl edge(from: symbol, to: symbol) //edge(from, to): There exists an immediate data-flow from instruction from to instruction to.
+.decl path(from: symbol, to: symbol) //Path(from, to): There exists a transitive tainted data-flow from instruction from to instruction to.
+.decl sanitizer(inst: symbol) //sanitizer(inst) : There exists a function call at intruction inst that sanitizes a tainted input.
+.decl div(denom: symbol, inst: symbol) //div(denom, inst) : There exists a division operation at instruction inst whose divisor is variable denom.
+.decl alarm(inst: symbol) //div(denom, inst) : There exists a division operation at instruction inst whose divisor is variable denom.
 
 .input taint
 .output taint
@@ -37,10 +37,31 @@
 .output alarm
 
 /* Reaching definition Analysis */
+
 kill(curr_inst, old_inst) :- def(var, curr_inst), def(var, old_inst).
-out(inst, inst) :- def(_, inst).
+out(inst, inst) :- def(_, inst). 
 out(inst, def_inst) :- in(inst, def_inst), !kill(inst, def_inst).
 in(inst, def_inst) :- out(prev_inst, def_inst), next(prev_inst, inst).
 
 /* Rules for taint Analysis */
 /* TODO: Add the rules for taint analysis */
+/*x = alloca i32          ; I0
+*y = alloca i32          ; I1
+*a = load i32, i32* x    ; I3 use(I0,I3) so edge from I0 to I3
+*store i32 a, i32* y     ; I4
+*def(I1,I4) where I1 is var, edge is from I4 to I1, and from I3 to I4
+*/
+
+//start from from, and reach to, and to use it
+//only have an edge crosses over
+edge(from,to):- def(var,from),use(var,to), in(to,from).
+
+//base case edge from start to dest there is a path
+path(from,to):- edge(from,to),taint(from). //direct path, tainted path of data flow, 
+
+//transitive path, path from start to someplace, someplace to somewhere else
+path(from, to):- path(from, intermidiate), edge(intermidiate,to) , !sanitizer(intermidiate). //indirect path
+
+//there is an alarm when there is a path to the a divisor
+alarm(inst):-  path(_, denom), div(denom,inst).
+
