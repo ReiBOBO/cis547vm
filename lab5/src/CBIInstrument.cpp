@@ -105,6 +105,7 @@ void instrumentBranch(Module *M, BranchInst *Branch, int Line, int Col) {
   //Register the fucntion into the Modole
   auto *BranchFunction = M->getFunction(CBI_BRANCH_FUNCTION_NAME);
   CallInst::Create(BranchFunction, Args,"",Branch);
+  
 
 }
 

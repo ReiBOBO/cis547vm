@@ -29,7 +29,7 @@ void instrumentSanitize(Module *M, Instruction &I, int Line, int Col) {
   std::vector<Value *> Args = {Divisor, LineVal, ColVal};
 
   auto *Fun = M->getFunction(SANITIZE_FUNCTION_NAME);
-  CallInst::Create(Fun, Args, "", &I);
+    Inst::Create(Fun, Args, "", &I);
 }
 
 bool Instrument::runOnFunction(Function &F) {

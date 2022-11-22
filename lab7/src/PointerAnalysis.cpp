@@ -25,7 +25,8 @@ void PointerAnalysis::transfer(Instruction *Inst, PointsToInfo &PointsTo) {
                      std::inserter(Result, Result.begin()));
       PointsTo[I] = Result;
     }
-  } else if (LoadInst *Load = dyn_cast<LoadInst>(Inst)) {
+  } else if (LoadInst *Load = dyn_cast<
+  Inst>(Inst)) {
     if (!Load->getType()->isPointerTy())
       return;
     std::string Variable = variable(Load->getPointerOperand());
