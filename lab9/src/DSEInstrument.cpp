@@ -253,8 +253,8 @@ void instrument(Module *Mod, Instruction *I) {
       return;
     // TODO: Implement.
     //out value
-    auto val = BI->getCondition();
-    instrumentValue(Mod,val,BI);
+    // auto val = BI->getCondition();
+    // instrumentValue(Mod,val,BI);
     instrumentBranch(Mod,BI);
   } else if (BinaryOperator *BO = dyn_cast<BinaryOperator>(I)) {
     // TODO: Implement.

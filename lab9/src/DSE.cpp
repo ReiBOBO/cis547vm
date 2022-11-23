@@ -64,7 +64,7 @@ void generateInput() {
     }
     z3::check_result Result = Solver.check();
     if (Result == z3::sat) {
-      std::cout<<"Got new input\n";
+      //std::cout<<"Got new input\n";
       storeInput();
       printNewPathCondition(Vec);
       // getchar();
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
   struct stat Buffer;
   int Iter = 0;
   while (Iter < MaxIter) {
-    int Ret = std::system(Target.c_str());
+    int Ret = std::system(Target.c_str());//Target.c_str() give you a return value
     if (Ret) {
       std::cout << "Crashing input found (" << Iter << " iters)" << std::endl;
       break;

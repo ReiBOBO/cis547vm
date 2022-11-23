@@ -12,7 +12,7 @@
  *
  * @param OldVec Vector of Z3 expressions.
  */
-std::set<z3::expr> visited;
+std::set<z3::expr_vector> visited_paths;
 void searchStrategy(z3::expr_vector &OldVec) {
     //stack of expressions
     //operator to change it !E
@@ -22,34 +22,41 @@ void searchStrategy(z3::expr_vector &OldVec) {
     //visited set counting DFS
     //if OldVec is now empty, return
     // while (!OldVec.empty()){
-        // std::cout<<"New iteration: Set of OIdVec: ";
-        // for (auto const &exp: OldVec){
-        //     std::cout<<exp<<","<<std::endl;
-        // }
-        // std::cout<<"Set of Visited: ";
-        // for (auto const &exp: visited){
-        //     std::cout<<exp<<","<<std::endl;
-        // }
-        z3::expr SE = OldVec.back();
-        z3::expr negatedSE = (!SE);
-        OldVec.pop_back();
-        OldVec.push_back(negatedSE);
-        // auto isvisited = false;
-        // auto isSE_in = (visited.find(SE)==visited.end());
-        // auto IsNegate_in = (visited.find(negatedSE)==visited.end());
-        // visited.insert(SE);
-        // if(!isSE_in && !IsNegate_in) {
-        //     //pop it out. this branch has been finished
-        //     OldVec.pop_back();
-        //     continue;
-        // }
-        // else{
-        //     OldVec.pop_back();
-        //     OldVec.push_back(negatedSE);
-        //     return;
-        // }
-    // }
+    //     std::cout<<" gogo \n";
+    //     z3::expr SE = OldVec.back();
+    //     OldVec.pop_back();
+    //     z3::expr negatedSE = (!SE);
+    //     visited.insert(SE);
+    //     if(!OldVec.empty() && negatedSE == OldVec.back()) {
+    //     //     std::cout<<SE<<" SE \n";
+    //     //     std::cout<<negatedSE<<" negated SE \n";
+    //     //     //pop it out. this branch has been finished
+    //     //         for (auto const &exp: visited){
+    //     //     std::cout<<exp<<","<<std::endl;
+    //     // }
+    //     std::cout<<SE<<" lolo \n";
+    //         OldVec.pop_back();
+    //         continue;
+    //     }
+    //     else{
+    //         std::cout<<SE<<" haha \n";
+    //         std::cout<<negatedSE<<" gaga \n";
+    //         OldVec.push_back(SE);
+    //         OldVec.push_back(negatedSE);
+    //         return;
+    //     }
+        z3::expr negated_SE= OldVec.back();
+        bool is_visited = false;
+        do{
+            if (OldVec.empty()){
+                return;
+            }
+
+
+        }while(!OldVec.empty())
+        
+        
     
 
-    
+}
 }

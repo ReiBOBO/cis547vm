@@ -87,7 +87,7 @@ extern "C" void __DSE_ICmp__(int R, int Op) {
   SI.getStack().pop(); 
   z3::expr op1 = eval(SI.getStack().top());
   SI.getStack().pop(); 
-  z3::expr SE =SI.getContext().int_val((uintptr_t)R);
+  z3::expr SE =op2;
   Mem.erase(Addr);
   //switch case
   /*
@@ -106,29 +106,35 @@ extern "C" void __DSE_ICmp__(int R, int Op) {
     //equal
     case llvm::CmpInst::Predicate::ICMP_EQ:
     SE=(op1==op2);
+    break;
     //not equal
     case llvm::CmpInst::Predicate::ICMP_NE:
     SE=(op1!=op2);
+    break;
     //ugt
     //sgt
     case llvm::CmpInst::Predicate::ICMP_UGT :
     case llvm::CmpInst::Predicate::ICMP_SGT:
     SE= (op1>op2);
+    break;
     //uge
     //sge
     case llvm::CmpInst::Predicate::ICMP_UGE:
     case llvm::CmpInst::Predicate::ICMP_SGE:
     SE = (op1>=op2);
+    break;
     //ult
     //slt
     case llvm::CmpInst::Predicate::ICMP_ULT:
     case llvm::CmpInst::Predicate::ICMP_SLT:
     SE = (op1<op2);
+    break;
     //ule
     //sle
     case llvm::CmpInst::Predicate::ICMP_ULE:
     case llvm::CmpInst::Predicate::ICMP_SLE:
-    SE = (op1<=op2);   
+    SE = (op1<=op2); 
+    break;  
   }
   Mem.insert(std::make_pair(Addr,SE));
 
@@ -159,19 +165,23 @@ extern "C" void __DSE_BinOp__(int R, int Op) {
     case llvm::BinaryOperator::BinaryOps::Add:
     case llvm::BinaryOperator::BinaryOps::FAdd:
       SE=op1+op2;
+      break;
     //-
     case llvm::BinaryOperator::BinaryOps::Sub:
     case llvm::BinaryOperator::BinaryOps::FSub:
       SE=op1-op2;
+      break;
     //*
     case llvm::BinaryOperator::BinaryOps::Mul:
     case llvm::BinaryOperator::BinaryOps::FMul:
       SE=op1*op2;
+      break;
     //
     case llvm::BinaryOperator::BinaryOps::UDiv:
     case llvm::BinaryOperator::BinaryOps::SDiv:
     case llvm::BinaryOperator::BinaryOps::FDiv:
       SE=op1/op2;
+      break;
     }
   Mem.insert(std::make_pair(Addr,SE));
 }
